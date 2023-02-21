@@ -43,7 +43,7 @@ game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("StartMenu"):Wai
 		["rbxassetid://2637545558"] = "Ring",
 		["rbxassetid://2877143560"] = "Jewel",
 		["rbxassetid://5196776695"] = "Ring",
-		["rbxassetid://5204453430"] = "Scroll,
+		["rbxassetid://5204453430"] = "Scroll",
 		["rbxassetid://%205196551436%20"] = "Amulet",
 		["rbxassetid://%205196577540%20"] = "Old Amulet",
 		["rbxassetid://%205196782997%20"] = "Old Ring",
