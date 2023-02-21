@@ -1,0 +1,343 @@
+print("Script executed");
+wait(1);
+game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("StartMenu"):WaitForChild("Choices"):WaitForChild("Play").MouseButton1Click:Connect(function()
+	print("Menu pressed wait 1")
+	wait(1);	
+
+	local rarities = {"Common", "Lesser", "Scroll", "Artifact"}
+	local colors = {Color3.new((15 / 255),(175 / 255),(76 / 255)), Color3.new((19 / 255),(235 / 255),(76 / 255)), Color3.new((19 / 255),(148 / 255),(235 / 255)), Color3.new((225 / 255),(227 / 255),(43 / 255))}
+	local RunService = game:GetService("RunService");
+	local HttpService = game:GetService("HttpService");
+	local settings = {}
+	local ReallyLowNumber = 0;
+	pcall(function()
+		settings = HttpService:JSONDecode(readfile("joedickysettings.txt"));
+	end)
+	for i,v in pairs(rarities) do
+		local highlightObject = Instance.new("Model");
+		highlightObject.Parent = workspace;
+		highlightObject.Name = "renh_" .. v
+		local highlight = Instance.new("Highlight");
+		highlight.Parent = highlightObject;
+		highlight.FillColor = colors[i];
+		highlight.FillTransparency = 0.5;
+		highlight.OutlineColor = colors[i];
+		highlight.OutlineTransparency = 0;
+		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
+	end
+	function ReverseTable(t)
+		local reversedTable = {}
+		local itemCount = #t
+		for k, v in ipairs(t) do
+			reversedTable[itemCount + 1 - k] = v
+		end
+		return reversedTable
+	end
+
+	local ids = {
+		["rbxassetid://5196551436"] = "Amulet",
+		["rbxassetid://5196577540"] = "Old Amulet",
+		["rbxassetid://5196782997"] = "Old Ring",
+		["rbxassetid://5204003946"] = "Goblet",
+		["rbxassetid://60791940"] = "Scroll",
+		["rbxassetid://2637545558"] = "Ring",
+		["rbxassetid://2877143560"] = "Jewel",
+		["rbxassetid://5196776695"] = "Ring",
+		["rbxassetid://%205196551436%20"] = "Amulet",
+		["rbxassetid://%205196577540%20"] = "Old Amulet",
+		["rbxassetid://%205196782997%20"] = "Old Ring",
+		["rbxassetid://%205204003946%20"] = "Goblet",
+		["rbxassetid://%2060791940%20"] = "Scroll",
+		["rbxassetid://%202637545558%20"] = "Ring",
+		["rbxassetid://%202877143560%20"] = "Jewel",
+		["rbxassetid://%205196776695%20"] = "Ring",
+	}
+
+	local rarities = {
+		["Amulet"] = "Common",
+		["Old Amulet"] = "Common",
+		["Old Ring"] = "Common",
+		["Goblet"] = "Common",
+		["Scroll"] = "Scroll",
+		["Ring"] = "Common",
+		["Jewel"] = "Lesser",
+		["Opal"] = "Lesser",
+		["Idol of the Forgotten"] = "Common",
+
+	}
+
+	function createESP(v) 
+		if (v:IsA("MeshPart") or v:IsA("Part") or v:IsA("UnionOperation")) and v:FindFirstChild("ID") then
+			pcall(function()
+				local rarity;
+				if v:IsA("MeshPart") and ids[v.MeshId] then
+					rarity = rarities[ids[v.MeshId]];
+				else if v:IsA("Part") and v:FindFirstChildWhichIsA("SpecialMesh") and ids[v:FindFirstChildWhichIsA("SpecialMesh").MeshId] then
+						rarity = rarities[ids[v:FindFirstChildWhichIsA("SpecialMesh").MeshId]];
+					else if v:IsA("Part") and v:FindFirstChildWhichIsA("SpecialMesh") and v:FindFirstChild("OrbParticle") then
+							rarity = "Artifact";			
+						else if v:IsA("UnionOperation") then
+								rarity = rarities["Idol of the Forgotten"];
+							else if v:IsA("Part") and v:FindFirstChildWhichIsA("SpecialMesh") and v:FindFirstChildWhichIsA("SpecialMesh").MeshType == Enum.MeshType.Sphere then
+									rarity = rarities["Opal"];				
+								else
+									rarity = "Artifact";			
+								end
+							end
+						end
+					end
+				end
+
+				local andy = v:Clone();
+				andy.Parent = game.Workspace["renh_" .. rarity];
+				local presize = andy.Size;
+
+				andy.Size = Vector3.new(presize.X - 0.1, presize.Y - 0.1, presize.Z - 0.1);
+				for _,v in pairs(andy:GetChildren()) do
+					if v.Name ~= "Mesh" then
+						v:Destroy();
+					end
+				end
+				local sg;
+				if rarity == "Artifact" then
+					sg = Instance.new("BillboardGui");
+					sg.Parent = andy;
+					sg.AlwaysOnTop = true;
+					sg.Size = UDim2.new(4,0,4,0);
+					local img = Instance.new("ImageLabel");
+					img.Parent = sg;
+					img.Size = UDim2.new(0.35,0,0.35,0);
+					img.Image = "http://www.roblox.com/asset/?id=4001273509";
+					img.BackgroundColor3 = Color3.new(1,1,0);
+				end
+
+				v.AncestryChanged:connect(function()
+					if not v:IsDescendantOf(game) then
+						andy:Destroy();
+					end
+				end)
+				RunService.RenderStepped:Connect(function()
+					pcall(function()
+						fireclickdetector(v.Part.ClickDetector)
+					end)
+				end)
+			end)
+		end
+	end
+
+
+
+	for _, v in pairs(workspace:GetChildren()) do
+		createESP(v);
+	end
+	workspace.ChildAdded:Connect(createESP);
+
+	local uis = game:GetService("UserInputService");
+	local tps = game:GetService("TeleportService");
+
+	local dangerGUI = game.Players.LocalPlayer.PlayerGui.DangerGui.TextLabel
+	local pchara = game.Players.LocalPlayer.Character
+	uis.InputBegan:Connect(function(e, chatting)
+		if not chatting then
+			if e.KeyCode == Enum.KeyCode.Z then
+				if pchara:FindFirstChild("ResetHighlight") and dangerGUI.Text == "Safe" then
+					pchara:Destroy()
+				else if not pchara:FindFirstChild("ResetHighlight") then
+						local highih = Instance.new("Highlight");
+						highih.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
+						highih.FillColor = Color3.new(1,0,0);
+						highih.FillTransparency = 0.5;
+						highih.Parent = pchara;
+						highih.Name = "ResetHighlight";
+						wait(3);
+						pcall(function()
+							highih:Destroy();
+						end)
+					end
+
+				end
+			else if e.KeyCode == Enum.KeyCode.RightAlt and dangerGUI.Text == "Safe" then
+					local player = game.Players.LocalPlayer
+					local cam = workspace.CurrentCamera
+					player.CameraMode = Enum.CameraMode.LockFirstPerson
+					cam.CFrame = CFrame.new(Vector3.new(0,10,0), Vector3.new(0,-1000000,0))
+					game.Players.LocalPlayer.Character:Destroy()
+					tps:Teleport(3016661674)        
+					game.Players.LocalPlayer:Kick("Rejoining...")            
+				end
+			end
+		end
+	end)
+
+
+	local cog = Instance.new("ScreenGui");
+	cog.Parent = game.Players.LocalPlayer.PlayerGui;
+	local settingsCog = Instance.new("TextButton");
+	settingsCog.Parent = cog;
+	settingsCog.Position = UDim2.new(1, -55, 1, -55);
+	settingsCog.Size = UDim2.new(0,50,0,50);
+	settingsCog.Text = "⚙️"
+	settingsCog.TextSize = 25;
+	settingsCog.BackgroundColor3 = Color3.new(0,0.3,1)
+	settingsCog.TextYAlignment = Enum.TextYAlignment.Center;
+	settingsCog.TextXAlignment = Enum.TextXAlignment.Center;
+	settingsCog.TextColor3 = Color3.new(1,1,1);
+
+	local bindsUI = Instance.new("ScreenGui");
+	bindsUI.Enabled = false;
+	bindsUI.Parent = game.Players.LocalPlayer.PlayerGui;
+
+	local mainwindow = Instance.new("Frame");
+	mainwindow.Parent = bindsUI;
+	mainwindow.Position = UDim2.new(1, -560, 1, -305);
+	mainwindow.Size = UDim2.new(0,500,0,300);
+	mainwindow.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3);
+	mainwindow.BackgroundTransparency = 0.4
+
+	local layout = Instance.new("UIListLayout");
+	layout.FillDirection = Enum.FillDirection.Vertical;
+	layout.Padding = UDim.new(0, 10);
+
+	local bindsLayout = layout:Clone();
+
+	local scriptTitle = Instance.new("TextLabel");
+	scriptTitle.Parent = mainwindow;
+	scriptTitle.Position = UDim2.new(0,0,0,0)
+	scriptTitle.Size = UDim2.new(1,0,0,25);
+	scriptTitle.Text = "Joe Dicky Hub - Settings"
+
+	local settingsWindow = Instance.new("ScrollingFrame");
+	settingsWindow.Parent = mainwindow;
+	settingsWindow.Position = UDim2.new(0,0,0,25);
+	settingsWindow.Size = UDim2.new(1,0,0,137); -- other should be 138
+	settingsWindow.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3);
+	settingsWindow.BackgroundTransparency = 1
+	layout.Parent = settingsWindow;
+
+	local bindsWindow = Instance.new("ScrollingFrame");
+	bindsWindow.Parent = mainwindow;
+	bindsWindow.Position = UDim2.new(0,0,0,187);
+	bindsWindow.Size = UDim2.new(1,0,0,112); -- other should be 138
+	bindsWindow.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3);
+	bindsWindow.BackgroundTransparency = 0.9
+	bindsLayout.Parent = bindsWindow;
+
+	local keybindingsTitle = Instance.new("TextButton");
+	keybindingsTitle.Parent = mainwindow;
+	keybindingsTitle.Position = UDim2.new(0,0,0,162)
+	keybindingsTitle.Size = UDim2.new(1,0,0,25);
+	keybindingsTitle.LayoutOrder = 1;
+	keybindingsTitle.Text = "Keybindings (item must be unequipped) - click to refresh"
+
+	local lol = Instance.new("TextLabel");
+	lol.Parent = settingsWindow;
+	lol.Position = UDim2.new(0,15,0,5);
+	lol.Size = UDim2.new(1,0,0,75)
+	lol.Text = "Lmao no settings yet Sorry bozo";
+	lol.BackgroundColor3 = Color3.new(0,0,0.2);
+	lol.BackgroundTransparency = 0.4;
+	lol.TextColor3 = Color3.new(1,1,1);
+
+	local hovered = nil;
+
+	function renderlist() 
+		for i,v in pairs(bindsWindow:GetChildren()) do
+			if not v:IsA("UIListLayout") then
+				v:Remove();
+			end
+		end
+		for i,v in pairs(ReverseTable(game.Players.LocalPlayer.Backpack:GetChildren())) do
+			local itemFrame = Instance.new("Frame");
+			itemFrame.Parent = bindsWindow;
+			itemFrame.Size = UDim2.new(1,0,0,50);
+			itemFrame.BackgroundColor3 = Color3.new(0.3,0.3,0.3);
+
+
+			local itemName = Instance.new("TextLabel");
+			itemName.Parent = itemFrame;
+			itemName.Size = UDim2.new(0,250,0,40);
+			itemName.Position = UDim2.new(0,5,0,5);
+			itemName.Text = v.Name;
+			itemName.Font = Enum.Font.FredokaOne;
+			itemName.FontSize = Enum.FontSize.Size24;
+			itemName.TextColor3 = Color3.new(1,1,1);
+			itemName.BackgroundTransparency = 1;
+			itemName.Name = "ItemNameLabel";
+
+			local itemBind = Instance.new("TextButton");
+			itemBind.Parent = itemFrame;
+			itemBind.Size = UDim2.new(0, 40, 0, 40);
+			itemBind.Position = UDim2.new(1, -59, 0, 5);
+			itemBind.BackgroundColor3 = Color3.new(0.6,0.6,0.6);
+			itemBind.Text = "None";
+			if settings[v.Name] ~= nil then
+				itemBind.Text =  string.upper(settings[v.Name]);
+			end
+
+
+			itemBind.MouseButton1Click:Connect(function()
+				if hovered ~= nil then
+					hovered.BackgroundColor3 = Color3.new(0.6,0.6,0.6)
+					hovered.Text = "None";
+					settings[hovered.Parent.ItemNameLabel.Text] = "None";
+					pcall(function()
+						writefile("joedickysettings.txt", HttpService:JSONEncode(settings));
+					end)
+				end
+				hovered = itemBind;
+				hovered.BackgroundColor3 = Color3.new(0.7,0.7,0.7);
+				hovered.Text = "";				
+
+			end)
+			uis.InputBegan:Connect(function(e)
+				if hovered ~= nil and #uis:GetStringForKeyCode(e.KeyCode) > 0 then
+					hovered.Text = string.upper(uis:GetStringForKeyCode(e.KeyCode));
+					hovered.BackgroundColor3 = Color3.new(0.6,0.6,0.6)
+					settings[hovered.Parent.ItemNameLabel.Text] = string.lower(uis:GetStringForKeyCode(e.KeyCode));
+					pcall(function()
+						writefile("joedickysettings.txt", HttpService:JSONEncode(settings));
+					end)
+
+					hovered = nil;
+				end
+			end)
+
+		end
+	end
+
+	renderlist();
+
+	keybindingsTitle.MouseButton1Click:Connect(renderlist);
+
+	uis.InputBegan:Connect(function(e)
+		for i,v in pairs(settings) do
+			-- v = the key
+			-- i = the move
+			print (v .. " - " .. i);
+			if string.lower(uis:GetStringForKeyCode(e.KeyCode)) == v then
+				pcall(function()
+					if game.Players.LocalPlayer.Backpack:FindFirstChild(i) then 
+						game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild(i));
+						print("Equip")
+					else if game.Players.LocalPlayer.Character:FindFirstChild(i) then
+							game.Players.LocalPlayer.Character.Humanoid:UnequipTools();
+							print("Unequip")
+						end
+					end
+				end)
+			end
+		end
+	end)
+
+
+
+	settingsCog.MouseButton1Click:Connect(function()
+		if bindsUI.Enabled then
+			bindsUI.Enabled = false
+		else
+			bindsUI.Enabled = true
+		end
+	end)
+
+end)
+
