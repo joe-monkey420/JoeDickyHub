@@ -43,7 +43,6 @@ game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("StartMenu"):Wai
 		["rbxassetid://2637545558"] = "Ring",
 		["rbxassetid://2877143560"] = "Jewel",
 		["rbxassetid://5196776695"] = "Ring",
-		["rbxassetid://5204453430"] = "Scroll",
 		["rbxassetid://%205196551436%20"] = "Amulet",
 		["rbxassetid://%205196577540%20"] = "Old Amulet",
 		["rbxassetid://%205196782997%20"] = "Old Ring",
@@ -52,7 +51,6 @@ game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("StartMenu"):Wai
 		["rbxassetid://%202637545558%20"] = "Ring",
 		["rbxassetid://%202877143560%20"] = "Jewel",
 		["rbxassetid://%205196776695%20"] = "Ring",
-		["rbxassetid://%205204453430%20"] = "Scroll",
 	}
 
 	local rarities = {
@@ -139,6 +137,9 @@ game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("StartMenu"):Wai
 
 	local dangerGUI = game.Players.LocalPlayer.PlayerGui.DangerGui.TextLabel
 	local pchara = game.Players.LocalPlayer.Character
+	game.Players.LocalPlayer.CharacterAdded:Connect(function()
+		pchara = game.Players.LocalPlayer.Character;
+	end)
 	uis.InputBegan:Connect(function(e, chatting)
 		if not chatting then
 			if e.KeyCode == Enum.KeyCode.Z then
@@ -184,11 +185,13 @@ game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("StartMenu"):Wai
 	settingsCog.TextYAlignment = Enum.TextYAlignment.Center;
 	settingsCog.TextXAlignment = Enum.TextXAlignment.Center;
 	settingsCog.TextColor3 = Color3.new(1,1,1);
-
+	cog.ResetOnSpawn = false;
+	
 	local bindsUI = Instance.new("ScreenGui");
 	bindsUI.Enabled = false;
 	bindsUI.Parent = game.Players.LocalPlayer.PlayerGui;
-
+	bindsUI.ResetOnSpawn = false;
+	
 	local mainwindow = Instance.new("Frame");
 	mainwindow.Parent = bindsUI;
 	mainwindow.Position = UDim2.new(1, -560, 1, -305);
@@ -332,7 +335,7 @@ game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("StartMenu"):Wai
 	end)
 
 
-
+	
 	settingsCog.MouseButton1Click:Connect(function()
 		if bindsUI.Enabled then
 			bindsUI.Enabled = false
