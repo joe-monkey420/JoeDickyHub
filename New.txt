@@ -43,6 +43,7 @@ game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("StartMenu"):Wai
 		["rbxassetid://2637545558"] = "Ring",
 		["rbxassetid://2877143560"] = "Jewel",
 		["rbxassetid://5196776695"] = "Ring",
+		["rbxassetid://5204453430"] = "Scroll,
 		["rbxassetid://%205196551436%20"] = "Amulet",
 		["rbxassetid://%205196577540%20"] = "Old Amulet",
 		["rbxassetid://%205196782997%20"] = "Old Ring",
@@ -51,6 +52,7 @@ game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("StartMenu"):Wai
 		["rbxassetid://%202637545558%20"] = "Ring",
 		["rbxassetid://%202877143560%20"] = "Jewel",
 		["rbxassetid://%205196776695%20"] = "Ring",
+		["rbxassetid://%205204453430%20"] = "Scroll",
 	}
 
 	local rarities = {
